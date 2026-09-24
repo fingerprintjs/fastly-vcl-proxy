@@ -23,12 +23,7 @@ sub proxy_agent_download_recv {
 }
 
 sub proxy_agent_download_deliver {
-  # s-maxage only drives the edge TTL, so it is not passed on to browsers.
-  # Removed on delivery, so objects cached before this version are covered too.
-  unset resp.http.Cache-Control:s-maxage;
-
-  # The edge keeps the agent for s-maxage, far longer than the browser max-age,
-  # so the real age would make hits arrive already stale
+  # Hits are served with Age 0 so browsers keep the agent for the full max-age
   if (std.prefixof(fastly_info.state, "HIT")) {
     set resp.http.Age = "0";
     unset resp.http.Cache-Tag;
