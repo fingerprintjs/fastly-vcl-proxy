@@ -1,4 +1,6 @@
 sub proxy_agent_download_recv {
+  # Marks the request for vcl_deliver, the rewritten URL alone can't tell it apart from v4 requests
+  set client.identity = "integration-agent-request";
 
   unset req.http.cookie;
 
@@ -20,12 +22,11 @@ sub proxy_agent_download_recv {
   return(lookup);
 }
 
-sub proxy_agent_download_fetch {
-  # s-maxage only drives the edge TTL (already computed at this point), so it is not passed on to browsers
-  unset beresp.http.Cache-Control:s-maxage;
-}
-
 sub proxy_agent_download_deliver {
+  # s-maxage only drives the edge TTL, so it is not passed on to browsers.
+  # Removed on delivery, so objects cached before this version are covered too.
+  unset resp.http.Cache-Control:s-maxage;
+
   # The edge keeps the agent for s-maxage, far longer than the browser max-age,
   # so the real age would make hits arrive already stale
   if (std.prefixof(fastly_info.state, "HIT")) {
