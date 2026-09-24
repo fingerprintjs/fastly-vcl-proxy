@@ -1,13 +1,17 @@
 sub vcl_deliver {
 #FASTLY deliver
-  if (client.identity == "integration-request") {
+  if (std.prefixof(client.identity, "integration-")) {
     unset resp.http.Strict-Transport-Security;
+  }
+
+  if (client.identity == "integration-agent-request") {
+    call proxy_agent_download_deliver;
   }
 }
 
 sub vcl_fetch {
 #FASTLY fetch
-  if (client.identity == "integration-request") {
+  if (std.prefixof(client.identity, "integration-")) {
     unset beresp.http.Strict-Transport-Security;
   }
 }

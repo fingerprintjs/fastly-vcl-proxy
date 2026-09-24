@@ -1,4 +1,6 @@
 sub proxy_agent_download_recv {
+  # Marks the request for vcl_deliver, the rewritten URL alone can't tell it apart from v4 requests
+  set client.identity = "integration-agent-request";
 
   unset req.http.cookie;
 
@@ -18,4 +20,14 @@ sub proxy_agent_download_recv {
   set req.url = "/web/v" + var.version + "/" + var.apikey + var.loaderversion + "?" + req.url.qs;
 
   return(lookup);
+}
+
+sub proxy_agent_download_deliver {
+  # Hits are served with Age 0 so browsers keep the agent for the full max-age
+  if (std.prefixof(fastly_info.state, "HIT")) {
+    set resp.http.Age = "0";
+    unset resp.http.Cache-Tag;
+  } else {
+    unset resp.http.Age;
+  }
 }
