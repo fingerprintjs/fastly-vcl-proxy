@@ -1,3 +1,13 @@
+## 2.1.1
+
+### Patch Changes
+
+- Adjust caching logic for agent downloads:
+
+  - Remove the client-facing `s-maxage` directive so the origin controls edge TTL.
+  - Set `age` to `0` on cache hits (so browsers keep the agent for the full `max-age`) and remove it on cache misses.
+  - Remove the upstream CDN's `cache-tag` on cache hits so it isn't exposed to clients. ([d7c20b7](https://github.com/fingerprintjs/fastly-vcl-proxy/commit/d7c20b7ad00e215a7f25fa2c5d195a9196746652))
+
 ## 2.1.0
 
 ### Minor Changes
