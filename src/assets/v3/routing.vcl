@@ -1,6 +1,6 @@
 sub try_handle_v3 {
   declare local var.integration_path STRING;
-  set var.integration_path = table.lookup(fingerprint_config, "INTEGRATION_PATH");
+  set var.integration_path = table.lookup(__config_table_name__, "INTEGRATION_PATH");
 
   declare local var.agent_script_path STRING;
   set var.agent_script_path = table.lookup(__config_table_name__, "AGENT_SCRIPT_DOWNLOAD_PATH");
