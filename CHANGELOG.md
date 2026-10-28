@@ -1,3 +1,9 @@
+## 2.1.2
+
+### Patch Changes
+
+- Use the configured dictionary name (`--config-table-name`) for the `INTEGRATION_PATH` lookup in v3 routing instead of the hardcoded `fingerprint_config` ([9d4d22a](https://github.com/fingerprintjs/fastly-vcl-proxy/commit/9d4d22a487c73005646346bcc6672fec1481372e))
+
 ## 2.1.1
 
 ### Patch Changes
