@@ -1,4 +1,5 @@
 import { execSync } from 'child_process'
+import { setTimeout } from 'timers/promises'
 import pkg from '../../package.json' with { type: 'json' }
 
 function getEnv(name: string) {
@@ -7,6 +8,29 @@ function getEnv(name: string) {
     throw new Error(`${name} is not set`)
   }
   return value
+}
+
+// A newly created Fastly service takes a while to propagate. Until then, requests fail
+// and the mock tests time out, so wait until the integration status page is served.
+async function waitForServiceReady(statusUrl: URL) {
+  const timeoutMs = 5 * 60 * 1000
+  const intervalMs = 5000
+  const deadline = Date.now() + timeoutMs
+  while (Date.now() < deadline) {
+    try {
+      const response = await fetch(statusUrl, { signal: AbortSignal.timeout(intervalMs) })
+      const body = await response.text()
+      if (response.ok && body.includes('Fingerprint Pro Fastly VCL Integration')) {
+        console.info('Service is ready')
+        return
+      }
+      console.info(`Service not ready yet, status page returned ${response.status}`)
+    } catch (error) {
+      console.info('Service not ready yet:', error)
+    }
+    await setTimeout(intervalMs)
+  }
+  throw new Error(`Service was not ready after ${timeoutMs / 1000}s: ${statusUrl}`)
 }
 
 async function main() {
@@ -23,6 +47,10 @@ async function main() {
 
   console.info('Agent download path:', agentPath)
   console.info('Get result path:', resultPath)
+
+  const statusUrl = new URL(host)
+  statusUrl.pathname = `${getEnv('INTEGRATION_PATH')}/status`
+  await waitForServiceReady(statusUrl)
 
   console.info(`Running mock e2e tests for`, host)
 
