@@ -55,7 +55,7 @@ See the [Fastly VCL proxy integration guide](https://dev.fingerprint.com/docs/fa
 
 ## Deploying with Terraform
 
-You can also deploy the integration with the [Fingerprint Fastly VCL Terraform module](https://github.com/fingerprintjs/terraform-fastly-vcl-fingerprint-proxy-integration). The module creates a Fastly CDN Service, uploads the latest VCL template from the releases of this repository, and creates the `fingerprint_config` dictionary.
+You can also deploy the integration with the [Fingerprint Fastly VCL Terraform module](https://github.com/fingerprintjs/terraform-fastly-vcl-fingerprint-proxy-integration). The module creates a Fastly CDN Service with the VCL template from the releases of this repository, and creates the `fingerprint_config` dictionary. Each `terraform apply` updates the service to the newest release within the major version the module supports, currently v2.x.y.
 
 The module uses the `fastly` provider from your configuration, so configure the provider with your Fastly API token:
 
