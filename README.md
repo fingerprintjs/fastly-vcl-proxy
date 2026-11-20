@@ -53,6 +53,40 @@ This is a quick overview of the installation setup. For detailed step-by-step in
 
 See the [Fastly VCL proxy integration guide](https://dev.fingerprint.com/docs/fastly-vcl-proxy-integration#step-4-configure-the-fingerprint-javascript-agent-on-your-client) in our documentation for more details.
 
+## Deploying with Terraform
+
+You can also deploy the integration with the [Fingerprint Fastly VCL Terraform module](https://github.com/fingerprintjs/terraform-fastly-vcl-fingerprint-proxy-integration). The module creates a Fastly CDN Service with the VCL template from the releases of this repository, and creates the `fingerprint_config` dictionary. Each `terraform apply` updates the service to the newest release within the major version the module supports, currently v2.x.y.
+
+The module uses the `fastly` provider from your configuration, so configure the provider with your Fastly API token:
+
+```terraform
+terraform {
+  required_version = ">=1.5"
+  required_providers {
+    fastly = {
+      source  = "fastly/fastly"
+      version = ">= 7.0.0"
+    }
+  }
+}
+
+provider "fastly" {
+  # To use the FASTLY_API_KEY environment variable instead, leave out api_key.
+  api_key = "FASTLY_API_TOKEN"
+}
+
+module "fingerprint_fastly_vcl_integration" {
+  source             = "fingerprintjs/vcl-fingerprint-proxy-integration/fastly"
+  version            = "~> 3.0"
+  integration_domain = "metrics.yourwebsite.com"
+  integration_path   = "INTEGRATION_PATH"
+  main_host          = "origin.yourwebsite.com"
+  proxy_secret       = "PROXY_SECRET"
+}
+```
+
+For step-by-step instructions and the full list of variables, see [Deploy Fastly VCL using Terraform](https://docs.fingerprint.com/docs/deploy-fastly-vcl-using-terraform). If you use v2 of the module, see [Migrate the Fastly VCL Terraform module from v2 to v3](https://docs.fingerprint.com/docs/fastly-vcl-terraform-module-v2-to-v3-migration-guide).
+
 ## Customizing the template
 
 If you need to customize the template configuration, you can clone this repository and build the template locally with custom parameters.
